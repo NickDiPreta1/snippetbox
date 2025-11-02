@@ -1,2 +1,0 @@
-The internal directory will contain the ancillary non-applicationspecific code used in the project. 
-We’ll use it to hold potentially reusable code like validation helpers and the SQL database models for the project.
