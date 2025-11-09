@@ -19,10 +19,6 @@ func (app *application) serverError(w http.ResponseWriter, err error) {
 }
 
 // clientError sends a specific client-side error response (4xx) to the user.
-//
-// This should be used when the client makes a bad request — such as malformed input,
-// missing parameters, or unauthorized access. It sends the standard HTTP status text
-// (e.g., "Bad Request", "Unauthorized", "Not Found") as the response body.
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
@@ -32,4 +28,20 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 // It’s just a shorthand for app.clientError(w, http.StatusNotFound)
 func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
+}
+
+func (app *application) render(w http.ResponseWriter, status int, page string, data *templateData) {
+	ts, ok := app.templateCache[page]
+	if !ok {
+		err := fmt.Errorf("the templates %s does not exist", page)
+		app.serverError(w, err)
+		return
+	}
+
+	w.WriteHeader(status)
+
+	err := ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
