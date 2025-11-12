@@ -42,6 +42,7 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 
 	buf := new(bytes.Buffer)
 
+	// base is the entry point we've set for all of our templates
 	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.serverError(w, err)
