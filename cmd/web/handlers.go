@@ -98,18 +98,56 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
 
-func (a *application) userSignup(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Display a HTML form for signing up a new user...")
+type userSignUpForm struct {
+	Name                string `form:"name"`
+	Email               string `form:"email"`
+	Password            string `form:"password"`
+	validator.Validator `form:"-"`
 }
-func (a *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = userSignUpForm{}
+	app.render(w, http.StatusOK, "signup.tmpl.html", data)
+}
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	var form userSignUpForm
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.Name), "name", "This field cannot be blank")
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.PermittedEmail(form.Email), "email", "This must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "signup.tmpl.html", data)
+		return
+	}
+
 	fmt.Fprintln(w, "Create a new user...")
+
+	// err = app.users.Insert(form.Name, form.Email, form.Password)
+	// if err != nil {
+	// 	app.serverError(w, err)
+	// 	return
+	// }
+
+	// app.sessionManager.Put(r.Context(), "flash", "User successfully created!")
+	// http.Redirect(w, r, "/", http.StatusSeeOther)
 }
-func (a *application) userLogin(w http.ResponseWriter, r *http.Request) {
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Display a HTML form for logging in a user...")
 }
-func (a *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Authenticate and login the user...")
 }
-func (a *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Logout the user...")
 }
