@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -18,7 +20,7 @@ type UserModel struct {
 }
 
 func (m *UserModel) Insert(name, email, password string) error {
-	return nil
+	hashedPassword := bcrypt.GenerateFromPassword([]byte(password), 12)
 }
 
 func (m *UserModel) Authenticate(email, password string) (int, error) {

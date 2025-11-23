@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"net/mail"
 	"strings"
 	"unicode/utf8"
 )
@@ -35,6 +36,16 @@ func NotBlank(value string) bool {
 
 func MaxChars(value string, n int) bool {
 	return utf8.RuneCountInString(value) <= n
+}
+
+func MinChars(value string, n int) bool {
+	trimmed := strings.TrimSpace(value)
+	return utf8.RuneCountInString(trimmed) >= n
+}
+
+func PermittedEmail(value string) bool {
+	_, err := mail.ParseAddress(value)
+	return err == nil
 }
 
 func PermittedInt(value int, permittedValues ...int) bool {
