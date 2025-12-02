@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,25 +11,22 @@ import (
 )
 
 func TestPing(t *testing.T) {
-
 	rr := httptest.NewRecorder()
+
 	r, err := http.NewRequest(http.MethodGet, "/", nil)
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
 	}
 
 	ping(rr, r)
 
-	rs := rr.Result()
+	res := rr.Result()
+	assert.Equal(t, res.StatusCode, http.StatusOK)
 
-	assert.Equal(t, rs.StatusCode, http.StatusOK)
-
-	defer rs.Body.Close()
-	body, err := io.ReadAll(rs.Body)
+	resBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
 	}
-	body = bytes.TrimSpace(body)
 
-	assert.Equal(t, string(body), "OK")
+	assert.Equal(t, string(resBytes), "OK")
 }
