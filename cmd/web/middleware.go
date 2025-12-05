@@ -55,11 +55,17 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 
 func noSurf(next http.Handler) http.Handler {
 	csrfHandler := nosurf.New(next)
+
 	csrfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
 		Path:     "/",
 		Secure:   true,
 	})
+	csrfHandler.SetFailureHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("CSRF failure:", nosurf.Reason(r))
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+	}))
+
 	return csrfHandler
 }
 

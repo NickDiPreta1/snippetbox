@@ -107,6 +107,8 @@ func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "signup.tmpl.html", data)
 }
 func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("HIT userSignupPost")
+
 	var form userSignUpForm
 	err := app.decodePostForm(r, &form)
 	if err != nil {
