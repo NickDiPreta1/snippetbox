@@ -4,12 +4,14 @@
         <a href='/'>Home</a>
         <a href='/about'>About</a>
         {{if .IsAuthenticated}}
-        <a href='/snippet/create'>Create Snippet</a>
+        <a href='/snippet/create'>Create snippet</a>
         {{end}}
     </div>
     <div>
         {{if .IsAuthenticated}}
-        <form action="/user/logout" method="POST">
+        <!-- Add the view account link for authenticated users -->
+        <a href='/account/view'>Account</a>
+        <form action='/user/logout' method='POST'>
             <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
             <button>Logout</button>
         </form>
