@@ -244,3 +244,20 @@ func (app *application) accountView(w http.ResponseWriter, r *http.Request) {
 
 	app.render(w, http.StatusOK, "account.tmpl.html", data)
 }
+
+type changePasswordForm struct {
+	currentPassword         string `form:"currentPassword"`
+	newPassword             string `form:"newPassword"`
+	newPasswordConfirmation string `form:"newPasswordConfirmation"`
+	validator.Validator     `form: "-"`
+}
+
+func (app *application) accountPasswordUpdate(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = changePasswordForm{}
+	app.render(w, http.StatusOK, "password.tmpl.html", data)
+}
+
+func (app *application) accountPasswordUpdatePost(w http.ResponseWriter, r *http.Request) {
+
+}
